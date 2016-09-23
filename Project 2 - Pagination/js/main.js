@@ -10,11 +10,14 @@ var addSearchElement = function() {
 	// append the input box
 	var inputBox = document.createElement("input");
 	inputBox.setAttribute("placeholder", "Search for students...");
+	inputBox.setAttribute("id", "searchBox");
+	inputBox.onkeyup = runSearch; // update the filtered list as the user types
 	searchDiv.appendChild(inputBox);
 	
 	// append the search button
 	var searchButton = document.createElement("button");
 	searchButton.innerText = "Search";
+	searchButton.onclick = runSearch;
 	searchDiv.appendChild(searchButton);
 	
 	// append to the page header
@@ -51,8 +54,7 @@ var addPaginationButtons = function() {
 	}
 	studentList.insertAdjacentElement("afterend", pageDiv);
 	
-	// initialize to the first page clicked (div->ul->li->a.click())
-	pageDiv.childNodes[0].childNodes[0].childNodes[0].click();
+	runSearch(); // initialize the 'match' class on all li elements and start on page 1
 }
 
 // Navigate to the page click/pressed
@@ -61,19 +63,52 @@ var goToPage = function(event) {
 	// Ignore tab keydown
 	if (event.type === "keydown" && event.key === "Tab")
 		return;
-	// Get array of student list items
-	var studentList = document.querySelectorAll(".student-list li");
-	// remove page offset to match student array index 0
-	var page = this.innerText - 1;
+	// Get array of student list items that have the match class
+	var studentList = document.querySelectorAll(".student-list li.match");
+	var page = this.innerText - 1; // remove page offset to match student array index 0
+	var pageMin = page + page * (pageSize - 1); // min li offset to show based on page size
+	var pageMax = page + (page + 1) * (pageSize - 1); // max li offset to show based on page size
 	// set each list item hidden unless it is in the page range
 	for (var i = 0; i < studentList.length; i++) {
-		// Anything less than the page start hide, and anything greater than the page end hide
-		// IE: page = 1. anything < (1 + 1*9) or 10, and anything > (1+(1+1)*9) or 19 (index base 0 so thats really 11 to 20)
-		if (i < page + (page)*9 || i > page + (page+1)*9)
+		if (i < pageMin || i > pageMax) {
 			studentList[i].setAttribute("hidden", "");
-		else
+		} else {
 			studentList[i].removeAttribute("hidden", "");
+		}
+		
 	}
+}
+
+// filter list of students. Matches text in search box to any partial of the student's name and email
+var runSearch =  function () {
+	var searchText = document.getElementById("searchBox").value; // get search text
+	var studentList = document.querySelectorAll(".student-list li"); // Get array of student list items
+	var found = 0;
+	
+	// add the match class to any students with an email or name that have a substring of the search text
+	// and remove the match class from any student that doesnt.
+	for (var i = 0; i < studentList.length; i++) {
+		if (studentList[i].getElementsByTagName("h3")[0].innerText.includes(searchText) || 
+			studentList[i].getElementsByClassName("email")[0].innerText.includes(searchText)) {
+			found++;
+			studentList[i].setAttribute("class", "student-item cf match");			
+		} else {
+			studentList[i].setAttribute("class", "student-item cf");
+			studentList[i].setAttribute("hidden", "");
+		}
+	}
+	// based on the match count, hide any extra page links
+	var pages = Math.ceil(found / pageSize);
+	var pageList = document.querySelectorAll(".pagination li");
+	for (var i = 0; i < pageList.length; i++) {
+		if (i < pages && pages != 1) {
+			pageList[i].children[0].removeAttribute("hidden", "");
+		} else {
+			pageList[i].children[0].setAttribute("hidden", "");
+		}
+	}
+	// go to first page after a search so the first 10 matches are displayed
+	pageList[0].children[0].click(); 
 }
 
 
