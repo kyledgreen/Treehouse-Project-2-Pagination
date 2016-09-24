@@ -24,6 +24,7 @@ var addSearchElement = function() {
 	var header = document.getElementsByClassName("page-header")[0];
 	header.insertAdjacentElement('beforeend', searchDiv);
 	
+	// create the hidden div that is displayed when no students match a search string
 	var noMatchDiv = document.createElement("div");
 	var noMatchH4 = document.createElement("h4");
 	noMatchH4.innerText = "No Matching Students...";
@@ -93,17 +94,18 @@ var goToPage = function(event) {
 	}
 }
 
-// filter list of students. Matches text in search box to any partial of the student's name and email
+// filter list of students. Matches text in search box to any partial of the student's name or email.
+//  hides any unneeded page buttons and goes to the first page of the filtered list
 var runSearch =  function () {
 	var searchText = document.getElementById("searchBox").value.toLowerCase(); // get search text
 	var studentList = document.querySelectorAll(".student-list li"); // Get array of student list items
 	var found = 0;
 	
-	// add the match class to any students with an email or name that have a substring of the search text
-	// and remove the match class from any student that doesnt.
+	// add the 'match' class to any students with an email or name that have a substring of the search text
+	//  and remove the match class from any student that doesnt. case insensitive.
 	for (var i = 0; i < studentList.length; i++) {
-		if (studentList[i].getElementsByTagName("h3")[0].innerText.toLowerCase().includes(searchText) || 
-			studentList[i].getElementsByClassName("email")[0].innerText.toLowerCase().includes(searchText)) {
+		if (studentList[i].getElementsByTagName("h3")[0].innerText.toLowerCase().indexOf(searchText) != -1 || 
+			studentList[i].getElementsByClassName("email")[0].innerText.toLowerCase().indexOf(searchText) != -1) {
 			found++;
 			studentList[i].setAttribute("class", "student-item cf match");			
 		} else {
@@ -111,6 +113,7 @@ var runSearch =  function () {
 			simpleFadeOut(studentList[i]);
 		}
 	}
+	
 	// based on the match count, hide any extra page links
 	var pages = Math.ceil(found / pageSize);
 	var pageList = document.querySelectorAll(".pagination li");
@@ -125,28 +128,29 @@ var runSearch =  function () {
 	pageList[0].children[0].click(); 
 }
 
-var simpleFadeOut = function (obj) {
+// takes a document element and every 10ms reduces the opacity by 5% from 100% to 0, and then hides the element
+var simpleFadeOut = function (docObject) {
 	var sub = 1;
 	var id = setInterval(fadeOut, 10);
 	function fadeOut() {
-		if (obj.style.opacity > 0) {
-			obj.style.opacity = sub;
+		if (docObject.style.opacity > 0) {
+			docObject.style.opacity = sub;
 			sub -= 0.05;
 		} else {
 			clearInterval(id);
-			obj.setAttribute("hidden", "");
+			docObject.setAttribute("hidden", "");
 		}
 	}
 }
-
-var simpleFadeIn = function (obj) {
+// takes a document element, unhides it at 1% opacity, and every 10ms increases the opacity by 1% from 0% to 100%
+var simpleFadeIn = function (docObject) {
 	var add = 0.01;
-	obj.style.opacity = add;
-	obj.removeAttribute("hidden", "");
+	docObject.style.opacity = add;
+	docObject.removeAttribute("hidden", "");
 	var id = setInterval(fadeIn, 10);
 	function fadeIn() {
-		if (obj.style.opacity < 1.0) {
-			obj.style.opacity = add;
+		if (docObject.style.opacity < 1.0) {
+			docObject.style.opacity = add;
 			add += 0.01;
 		} else {
 			clearInterval(id);
@@ -154,6 +158,6 @@ var simpleFadeIn = function (obj) {
 	}
 }
 
-
+// Initialize components
 addSearchElement();
 addPaginationButtons();
