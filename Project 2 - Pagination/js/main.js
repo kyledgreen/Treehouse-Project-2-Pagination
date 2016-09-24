@@ -23,6 +23,14 @@ var addSearchElement = function() {
 	// append to the page header
 	var header = document.getElementsByClassName("page-header")[0];
 	header.insertAdjacentElement('beforeend', searchDiv);
+	
+	var noMatchDiv = document.createElement("div");
+	var noMatchH4 = document.createElement("h4");
+	noMatchH4.innerText = "No Matching Students...";
+	noMatchDiv.setAttribute("hidden", "");
+	noMatchDiv.setAttribute("id", "noMatches");
+	noMatchDiv.appendChild(noMatchH4);	
+	header.insertAdjacentElement('afterend', noMatchDiv);
 }
 
 // Add a pagination button for every 10 list elements
@@ -71,11 +79,17 @@ var goToPage = function(event) {
 	// set each list item hidden unless it is in the page range
 	for (var i = 0; i < studentList.length; i++) {
 		if (i < pageMin || i > pageMax) {
-			studentList[i].setAttribute("hidden", "");
+			simpleFadeOut(studentList[i]);
 		} else {
-			studentList[i].removeAttribute("hidden", "");
+			simpleFadeIn(studentList[i]);
 		}
-		
+	}
+	
+	var divNoMatches = document.getElementById("noMatches");
+	if (studentList.length == 0) {
+		divNoMatches.removeAttribute("hidden", "");
+	} else {
+		divNoMatches.setAttribute("hidden", "");
 	}
 }
 
@@ -94,7 +108,7 @@ var runSearch =  function () {
 			studentList[i].setAttribute("class", "student-item cf match");			
 		} else {
 			studentList[i].setAttribute("class", "student-item cf");
-			studentList[i].setAttribute("hidden", "");
+			simpleFadeOut(studentList[i]);
 		}
 	}
 	// based on the match count, hide any extra page links
@@ -109,6 +123,35 @@ var runSearch =  function () {
 	}
 	// go to first page after a search so the first 10 matches are displayed
 	pageList[0].children[0].click(); 
+}
+
+var simpleFadeOut = function (obj) {
+	var sub = 1;
+	var id = setInterval(fadeOut, 10);
+	function fadeOut() {
+		if (obj.style.opacity > 0) {
+			obj.style.opacity = sub;
+			sub -= 0.05;
+		} else {
+			clearInterval(id);
+			obj.setAttribute("hidden", "");
+		}
+	}
+}
+
+var simpleFadeIn = function (obj) {
+	var add = 0.01;
+	obj.style.opacity = add;
+	obj.removeAttribute("hidden", "");
+	var id = setInterval(fadeIn, 10);
+	function fadeIn() {
+		if (obj.style.opacity < 1.0) {
+			obj.style.opacity = add;
+			add += 0.01;
+		} else {
+			clearInterval(id);
+		}
+	}
 }
 
 
