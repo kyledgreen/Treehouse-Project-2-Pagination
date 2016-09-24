@@ -1,3 +1,5 @@
+// Browser Compatibility checked in IE and Chrome.
+
 var pageSize = 10; // Save the page size in case we want to change it later
 
 // Create the Search element and add it to the end of the page-header
