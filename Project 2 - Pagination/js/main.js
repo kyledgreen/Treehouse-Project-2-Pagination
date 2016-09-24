@@ -95,15 +95,15 @@ var goToPage = function(event) {
 
 // filter list of students. Matches text in search box to any partial of the student's name and email
 var runSearch =  function () {
-	var searchText = document.getElementById("searchBox").value; // get search text
+	var searchText = document.getElementById("searchBox").value.toLowerCase(); // get search text
 	var studentList = document.querySelectorAll(".student-list li"); // Get array of student list items
 	var found = 0;
 	
 	// add the match class to any students with an email or name that have a substring of the search text
 	// and remove the match class from any student that doesnt.
 	for (var i = 0; i < studentList.length; i++) {
-		if (studentList[i].getElementsByTagName("h3")[0].innerText.includes(searchText) || 
-			studentList[i].getElementsByClassName("email")[0].innerText.includes(searchText)) {
+		if (studentList[i].getElementsByTagName("h3")[0].innerText.toLowerCase().includes(searchText) || 
+			studentList[i].getElementsByClassName("email")[0].innerText.toLowerCase().includes(searchText)) {
 			found++;
 			studentList[i].setAttribute("class", "student-item cf match");			
 		} else {
