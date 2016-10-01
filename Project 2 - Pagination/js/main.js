@@ -13,7 +13,7 @@ var addSearchElement = function() {
 	var inputBox = document.createElement("input");
 	inputBox.setAttribute("placeholder", "Search for students...");
 	inputBox.setAttribute("id", "searchBox");
-	inputBox.onkeyup = runSearch; // update the filtered list as the user types
+	inputBox.oninput = runSearch; // update the filtered list as the user types
 	searchDiv.appendChild(inputBox);
 	
 	// append the search button
@@ -34,7 +34,7 @@ var addSearchElement = function() {
 	noMatchDiv.setAttribute("id", "noMatches");
 	noMatchDiv.appendChild(noMatchH4);	
 	header.insertAdjacentElement('afterend', noMatchDiv);
-}
+};
 
 // Add a pagination button for every 10 list elements
 var addPaginationButtons = function() {
@@ -66,7 +66,7 @@ var addPaginationButtons = function() {
 	studentList.insertAdjacentElement("afterend", pageDiv);
 	
 	runSearch(); // initialize the 'match' class on all li elements and start on page 1
-}
+};
 
 // Navigate to the page click/pressed
 var goToPage = function(event) {
@@ -74,6 +74,10 @@ var goToPage = function(event) {
 	// Ignore tab keydown
 	if (event.type === "keydown" && event.key === "Tab")
 		return;
+	var links = document.querySelectorAll(".pagination li a");
+	for (var j = 0; j < links.length; j++)
+		links[j].removeAttribute('class', 'active');
+	this.setAttribute('class', 'active');
 	// Get array of student list items that have the match class
 	var studentList = document.querySelectorAll(".student-list li.match");
 	var page = this.innerText - 1; // remove page offset to match student array index 0
@@ -89,12 +93,12 @@ var goToPage = function(event) {
 	}
 	
 	var divNoMatches = document.getElementById("noMatches");
-	if (studentList.length == 0) {
+	if (studentList.length === 0) {
 		divNoMatches.removeAttribute("hidden", "");
 	} else {
 		divNoMatches.setAttribute("hidden", "");
 	}
-}
+};
 
 // filter list of students. Matches text in search box to any partial of the student's name or email.
 //  hides any unneeded page buttons and goes to the first page of the filtered list
@@ -119,16 +123,16 @@ var runSearch =  function () {
 	// based on the match count, hide any extra page links
 	var pages = Math.ceil(found / pageSize);
 	var pageList = document.querySelectorAll(".pagination li");
-	for (var i = 0; i < pageList.length; i++) {
-		if (i < pages && pages != 1) {
-			pageList[i].children[0].removeAttribute("hidden", "");
+	for (var x = 0; x < pageList.length; x++) {
+		if (x < pages && pages != 1) {
+			pageList[x].children[0].removeAttribute("hidden", "");
 		} else {
-			pageList[i].children[0].setAttribute("hidden", "");
+			pageList[x].children[0].setAttribute("hidden", "");
 		}
 	}
 	// go to first page after a search so the first 10 matches are displayed
 	pageList[0].children[0].click(); 
-}
+};
 
 // takes a document element and every 10ms reduces the opacity by 5% from 100% to 0, and then hides the element
 var simpleFadeOut = function (docObject) {
@@ -143,7 +147,8 @@ var simpleFadeOut = function (docObject) {
 			docObject.setAttribute("hidden", "");
 		}
 	}
-}
+};
+
 // takes a document element, unhides it at 1% opacity, and every 10ms increases the opacity by 1% from 0% to 100%
 var simpleFadeIn = function (docObject) {
 	var add = 0.01;
@@ -153,12 +158,12 @@ var simpleFadeIn = function (docObject) {
 	function fadeIn() {
 		if (docObject.style.opacity < 1.0) {
 			docObject.style.opacity = add;
-			add += 0.01;
+			add += 0.05;
 		} else {
 			clearInterval(id);
 		}
 	}
-}
+};
 
 // Initialize components
 addSearchElement();
